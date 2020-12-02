@@ -1,15 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Blog.Core.Interfaces;
+using Blog.Core.Model;
+using Blog.Core.Repositories;
+using Blog.Core.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 
 namespace Blog.Api
@@ -26,12 +24,15 @@ namespace Blog.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
+            services.AddTransient<IReadOnlyRepository<BlogPost>, PostRepository>();
+            services.AddTransient<IPostService, PostService>();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Blog.Api", Version = "v1" });
             });
+
+            services.AddDbContext<InMemoryBlogContext>(options => options.UseInMemoryDatabase(databaseName: "BlogDatabase"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
